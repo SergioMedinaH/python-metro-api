@@ -161,8 +161,8 @@ class handler(BaseHTTPRequestHandler):
         if 'paradaOrigen' in params and 'paradaDestino' in params:
             try:
                 # Convertir los valores a enteros
-                origen = params['paradaOrigen']
-                destino = params['paradaDestino']
+                origen = params['paradaOrigen'][0]
+                destino = params['paradaDestino'][0]
 
                 # Realizar la suma
                 ruta = nx.astar_path(G1, origen, destino, heuristic=heuristica, weight="weight")
