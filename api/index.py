@@ -143,7 +143,9 @@ def calcular_distancia(parada1: str, parada2: str) -> float:
 
     # Distancia en kilómetros
     distancia = R * c
-    return distancia
+    velocidad_promedio = 0.5
+    tiempo = distancia / velocidad_promedio
+    return tiempo
 
 
 def heuristica(paradaActual: str, paradaDestino: str) -> float:
