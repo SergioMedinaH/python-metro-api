@@ -117,14 +117,15 @@ def encontrar_parada(value):
     return None
 
 
-def calcular_tiempo(parada1: str, parada2: str) -> float:
-    """Calcula el tiempo en minutos entre dos paradas basándose en la distancia."""
+def calcular_distancia(parada1: str, parada2: str) -> float:
+    """Calcula la distancia en línea recta entre dos paradas utilizando sus latitudes y longitudes."""
     p1 = encontrar_parada(parada1)
     p2 = encontrar_parada(parada2)
-
+    
+    # Si no se encuentran ambas paradas, retornar un valor alto (para evitar un camino no válido)
     if not p1 or not p2:
         return float('inf')
-
+    
     # Radio de la Tierra en kilómetros
     R = 6371.0
 
@@ -137,18 +138,54 @@ def calcular_tiempo(parada1: str, parada2: str) -> float:
     dlon = lon2 - lon1
 
     # Fórmula de Haversine
-    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
     # Distancia en kilómetros
     distancia = R * c
+    return distancia
 
-    # Convertir distancia a tiempo (suponiendo una velocidad promedio de 30 km/h = 0.5 km/min)
-    velocidad_promedio = 0.5  # km por minuto
-    tiempo = distancia / velocidad_promedio
-
-    return tiempo
 
 def heuristica(paradaActual: str, paradaDestino: str) -> float:
-    """Calcula una heurística de tiempo en minutos entre la parada actual y la parada destino."""
-    return calcular_tiempo(paradaActual, paradaDestino)
+    """Calcula la distancia en línea recta entre la parada actual y la parada destino."""
+    return calcular_distancia(paradaActual, paradaDestino)
+
+class handler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        # Parsear los parámetros de la URL
+        query = urlparse(self.path).query
+        params = parse_qs(query)
+        
+        # Verificar que se reciban los parámetros "paradaOrigen" y "paradaDestino"
+        if 'paradaOrigen' in params and 'paradaDestino' in params:
+            try:
+                # Convertir los valores a enteros
+                origen = params['paradaOrigen'][0]
+                destino = params['paradaDestino'][0]
+
+                # Realizar la suma
+                ruta = nx.astar_path(G1, origen, destino, heuristic=heuristica, weight="weight")
+                tiempos = [G1[ruta[i]][ruta[i+1]]["weight"] for i in range(len(ruta) - 1)]
+
+                # Crear el diccionario de respuesta en JSON
+                response = {'ruta': ruta, 'tiempos': tiempos}
+
+                # Enviar la respuesta con el resultado en formato JSON
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(response).encode('utf-8'))
+            except ValueError:
+                # Manejar errores de conversión a entero
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': 'Los parametros son invalidos'}).encode('utf-8'))
+        else:
+            # Si faltan los parámetros
+            self.send_response(400)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': 'Faltan parámetros paradaOrigen y paradaDestino'}).encode('utf-8'))
