@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import math
+from pprint import pprint
 
 paradas = [
     # Línea A
@@ -9,26 +10,26 @@ paradas = [
     { "value": "congreso", "label": "Congreso", "lat": -34.6092415, "lng": -58.3926706, "linea": "A" },
     { "value": "saenzpena", "label": "Sáenz Peña", "lat": -34.6094200, "lng": -58.3866700, "linea": "A" },
     { "value": "lima", "label": "Lima", "lat": -34.6091054, "lng": -58.3825208, "linea": "A" },
-    { "value": "piedras", "label": "Piedras", "lat": -34.6092446, "lng": -58.3784204, "linea": "A" },
+    { "value": "piedras", "label": "Piedras", "lat": -34.608837932068, "lng": -58.378502407734, "linea": "A" },
     { "value": "peru", "label": "Perú", "lat": -34.6085633, "lng": -58.3744662, "linea": "A" },
     { "value": "plzmayo", "label": "Plaza de Mayo Casa Rosada", "lat": -34.6086997, "lng": -58.3714911, "linea": "A" },
 
     # Línea B
-    { "value": "pasteur", "label": "Pasteur AMIA", "lat": -34.6054673, "lng": -58.4031439, "linea": "B" },
+    { "value": "pasteur", "label": "Pasteur AMIA", "lat": -34.604623105662, "lng": -58.399357348627, "linea": "B" },
     { "value": "callaomaestro", "label": "Callao Maestro A. Bravo", "lat": -34.6045542, "lng": -58.3931682, "linea": "B" },
-    { "value": "uruguay", "label": "Uruguay", "lat": -34.6051435, "lng": -58.3889597, "linea": "B" },
+    { "value": "uruguay", "label": "Uruguay", "lat": -34.604046341872, "lng": -58.392845615810, "linea": "B" },
     { "value": "carlospellegrini", "label": "Carlos Pellegrini", "lat": -34.6034877, "lng": -58.3807319, "linea": "B" },
     { "value": "florida", "label": "Florida", "lat": -34.6033000, "lng": -58.3745300, "linea": "B" },
     { "value": "leandro", "label": "Leandro N. Alem", "lat": -34.6030011, "lng": -58.3706754, "linea": "B" },
 
     # Línea C
     { "value": "constitucion", "label": "Constitución", "lat": -34.6275021, "lng": -58.3824531, "linea": "C" },
-    { "value": "sanjuan", "label": "San Juan", "lat": -34.6242829, "lng": -58.3874077, "linea": "C" },
+    { "value": "sanjuan", "label": "San Juan", "lat": -34.622676270600, "lng": -58.379951566484, "linea": "C" },
     { "value": "independencia", "label": "Independencia", "lat": -34.6200717, "lng": -58.3837130, "linea": "C" },
-    { "value": "moreno", "label": "Moreno", "lat": -34.6103445, "lng": -58.3828383, "linea": "C" },
+    { "value": "moreno", "label": "Moreno", "lat": -34.612434686061, "lng": -58.380517847867, "linea": "C" },
     { "value": "avdemayo", "label": "Avenida de Mayo", "lat": -34.60899098, "lng": -58.38068279, "linea": "C" },
     { "value": "diagonal", "label": "Diagonal Norte", "lat": -34.6048383, "lng": -58.3794651, "linea": "C" },
-    { "value": "lavalle", "label": "Lavalle", "lat": -34.6020564, "lng": -58.3781247, "linea": "C" },
+    { "value": "lavalle", "label": "Lavalle", "lat": -34.594872221186, "lng": -58.378115594396, "linea": "C" },
     { "value": "sanmartin", "label": "General San Martín", "lat": -34.6008090, "lng": -58.3848683, "linea": "C" },
     { "value": "retiroc", "label": "Retiro", "lat": -34.5916364, "lng": -58.3748868, "linea": "C" },
 
@@ -155,5 +156,56 @@ def calcularRuta(origen: str, destino: str):
     return (ruta, tiempos)
 
 
+def hora_salida(hora_ini:int , hora_empiece_linea: int, hora_cierre_linea: int, intervalo_frecuencia: int) -> int:
+    hora = hora_empiece_linea
+    while hora_ini > hora:
+        hora += intervalo_frecuencia
+    if hora > hora_cierre_linea:
+        return -1
+    return hora
 
-print(calcularRuta("alberti", "peru"))
+def get_trayectos(resultado):
+    # Desempaquetar la tupla resultado
+    paradas_ruta_valores, tiempos = resultado
+    
+    # Convertir los valores de las paradas a objetos parada completos
+    paradas_ruta = [encontrar_parada(valor) for valor in paradas_ruta_valores]
+    
+    if paradas_ruta and len(paradas_ruta) > 0:
+        trayectos = []
+        trayecto_actual = {
+            "linea": paradas_ruta[0]["linea"],
+            "paradas": [paradas_ruta[0]],
+            "tiempos": []
+        }
+        
+        for index, parada in enumerate(paradas_ruta):
+            if index == 0:
+                continue
+            
+            parada_anterior = paradas_ruta[index - 1]
+            
+            if parada["linea"] == parada_anterior["linea"]:
+                trayecto_actual["paradas"].append(parada)
+                trayecto_actual["tiempos"].append(tiempos[index - 1])
+            else:
+                trayectos.append(trayecto_actual)
+                trayectos.append({
+                    "linea": "Transbordo",
+                    "paradas": [parada_anterior, parada],
+                    "tiempos": [tiempos[index - 1]]
+                })
+                trayecto_actual = {
+                    "linea": parada["linea"],
+                    "paradas": [parada],
+                    "tiempos": []
+                }
+        
+        trayectos.append(trayecto_actual)
+    
+    return trayectos
+
+pprint(get_trayectos(calcularRuta("alberti", "retiroc")))
+
+
+
