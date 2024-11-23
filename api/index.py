@@ -1,7 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import json
 import networkx as nx
-import matplotlib.pyplot as plt
 import math
 from urllib.parse import urlparse, parse_qs
 import os
@@ -123,11 +122,14 @@ class handler(BaseHTTPRequestHandler):
         params = parse_qs(query)
         
         # Verificar que se reciban los parámetros "paradaOrigen" y "paradaDestino"
-        if 'paradaOrigen' in params and 'paradaDestino' in params:
+        if 'paradaOrigen' in params and 'paradaDestino' in params and 'hora' in params and 'fecha' in params and 'prioridadTransbordos' in params:
             try:
                 # Convertir los valores a enteros
                 origen = params['paradaOrigen'][0]
                 destino = params['paradaDestino'][0]
+                hora = params['hora'][0] # formato HH:MM
+                fecha = params['fecha'][0] # dia de la semana  0 - Domingo, 1 - Lunes, 2 - Martes, 3 - Miercoles, 4 - Jueves, 5 - Viernes, 6 - Sabado
+                prioridadTransbordos = params['prioridadTransbordos'][0] # booleano
 
                 # Realizar la suma
                 ruta = nx.astar_path(G1, origen, destino, heuristic=heuristica, weight="weight")
@@ -153,4 +155,4 @@ class handler(BaseHTTPRequestHandler):
             self.send_response(400)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({'error': 'Faltan parámetros paradaOrigen y paradaDestino'}).encode('utf-8'))
+            self.wfile.write(json.dumps({'error': 'Falta algún parámetro como paradaOrigen, paradaDestino, hora, fecha o prioridadTransbordos'}).encode('utf-8'))
