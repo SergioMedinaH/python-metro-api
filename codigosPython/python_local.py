@@ -100,7 +100,8 @@ G1.add_edge("bolivar", "correocentral", weight=1)
 G1.add_edge("correocentral", "catalinas", weight=1)
 G1.add_edge("catalinas", "retiroe", weight=2)
 
-ruta_csv = "C:\\Users\\marti\\OneDrive\\Documents\\VisualStudio\\IA\\paradas.csv"
+ruta_csv = "C:\\Users\\sergi\\Documents\\Uni\\3 Semestre\\IA\\trabajometro\\python-metro-api\\data\\paradas.csv"
+
 
 paradas = []
 
@@ -322,5 +323,5 @@ def calcularRuta(origen: str, destino: str, hora_actual, priorizarTransbordos: b
 
     return trayectos
 
-pprint(calcularRuta("pasteur", "constitucion", "5:36", False))
+pprint(calcularRuta("alberti", "pichincha", "12:13", False))
 

@@ -226,7 +226,7 @@ class handler(BaseHTTPRequestHandler):
                 destino = params['paradaDestino'][0]
                 hora_actual = params['hora'][0] # formato HH:MM
                 fecha = params['fecha'][0] # dia de la semana  0 - Domingo, 1 - Lunes, 2 - Martes, 3 - Miercoles, 4 - Jueves, 5 - Viernes, 6 - Sabado
-                prioridadTransbordos = bool(params['prioridadTransbordos'][0]) # booleano
+                prioridadTransbordos = params['prioridadTransbordos'][0].lower() == 'true'  # booleano
 
                 if prioridadTransbordos:
                     G1.add_edge("independencia", "independenciae", weight=99999)
