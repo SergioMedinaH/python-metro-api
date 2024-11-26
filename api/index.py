@@ -63,9 +63,13 @@ G1.add_edge("catalinas", "retiroe", weight=2)
 
 
 def encontrar_parada(value):
-    """Devuelve la parada correspondiente al valor dado."""
+    """Devuelve la parada correspondiente al valor dado, reemplazando NaN por 'NaN' como string."""
     for parada in paradas:
         if parada["value"] == value:
+            # Reemplazar NaN por 'NaN' en los valores de la parada
+            for key, val in parada.items():
+                if isinstance(val, float) and (val != val):  # Verifica si es NaN
+                    parada[key] = 'NaN'
             return parada
     return None
 
