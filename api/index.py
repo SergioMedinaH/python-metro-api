@@ -271,9 +271,11 @@ class handler(BaseHTTPRequestHandler):
 
                     else:
                         hora_actual_segundos += sum(linea["tiempos"])
+                        
+                duracion_total = hora_actual_segundos - hora_actual_segundos_inicio
 
                 # Crear el diccionario de respuesta en JSON
-                response = {'ruta': ruta, 'tiempos': tiempos, 'trayectos': trayectos}
+                response = {'ruta': ruta, 'tiempos': tiempos, 'trayectos': trayectos, 'duracionTotal': duracion_total}
 
                 # Enviar la respuesta con el resultado en formato JSON
                 self.send_response(200)
