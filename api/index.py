@@ -17,6 +17,16 @@ csv_path = os.path.join(base_dir, '..', 'data', 'paradas.csv')
 df = pd.read_csv(csv_path)
 paradas = df.to_dict(orient='records')
 
+def encontrar_parada(value):
+    """Devuelve la parada correspondiente al valor dado, reemplazando NaN por 'NaN' como string."""
+    for parada in paradas:
+        if parada["value"] == value:
+            # Reemplazar NaN por 'NaN' en los valores de la parada
+            for key, val in parada.items():
+                if isinstance(val, float) and (val != val):  # Verifica si es NaN
+                    parada[key] = 'NaN'
+            return parada
+    return None
 
 def calcular_distancia(parada1: str, parada2: str) -> float:
     """Calcula la distancia en línea recta entre dos paradas utilizando sus latitudes y longitudes."""
@@ -95,16 +105,7 @@ G1.add_edge("catalinas", "retiroe", weight=calcular_distancia("catalinas", "reti
 
 
 
-def encontrar_parada(value):
-    """Devuelve la parada correspondiente al valor dado, reemplazando NaN por 'NaN' como string."""
-    for parada in paradas:
-        if parada["value"] == value:
-            # Reemplazar NaN por 'NaN' en los valores de la parada
-            for key, val in parada.items():
-                if isinstance(val, float) and (val != val):  # Verifica si es NaN
-                    parada[key] = 'NaN'
-            return parada
-    return None
+
 
 def hora_a_segundos(hora):
     horas, minutos = map(int, hora.split(":"))
@@ -112,8 +113,8 @@ def hora_a_segundos(hora):
 
 
 def segundos_a_hora(segundos):
-    horas = segundos // 3600
-    minutos = (segundos % 3600) // 60
+    horas = int( segundos // 3600)
+    minutos = int((segundos % 3600) // 60 )
     return f"{horas:02}:{minutos:02}"
 
 def tiempo_espera(paradaActual: str, direccion: str, hora_actual_segundos: int):
