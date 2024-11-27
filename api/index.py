@@ -130,26 +130,26 @@ def tiempo_espera(paradaActual: str, direccion: str, hora_actual_segundos: int):
 def obtenerTiempoTransbordo(parada1, parada2):
     nombre = f"{parada1["value"]}-{parada2["value"]}"
     transbordos = { 
-    "independencia-independenciae" : 170,
-    "independenciae-independencia" : 170,
+    "independencia-independenciae" : 112,
+    "independenciae-independencia" : 114,
 
-    "peru-bolivar": 170,
-    "bolivar-peru": 170,
+    "peru-bolivar": 132,
+    "bolivar-peru": 135,
 
-    "peru-catedral": 170,
-    "catedral-peru": 170,
+    "peru-catedral": 136,
+    "catedral-peru": 136,
 
-    "lima-avdemayo": 170,
-    "avdemayo-lima": 170,
+    "lima-avdemayo": 132,
+    "avdemayo-lima": 150,
 
-    "diagonal-9dejulio": 170,
-    "9dejulio-diagonal": 170,
+    "diagonal-9dejulio": 48,
+    "9dejulio-diagonal": 42,
 
-    "9dejulio-carlospellegrini": 170,
-    "carlospellegrini-9dejulio": 170,
+    "9dejulio-carlospellegrini": 90,
+    "carlospellegrini-9dejulio": 96,
 
-    "retiroc-retiroe": 170,
-    "retiroe-retiroc": 170
+    "retiroc-retiroe": 180,
+    "retiroe-retiroc": 180
     }
     return transbordos[nombre]
 
@@ -306,9 +306,11 @@ class handler(BaseHTTPRequestHandler):
                         hora_actual_segundos += sum(linea["tiempos"])
                         
                 duracion_total = hora_actual_segundos - hora_actual_segundos_inicio
+                
+                hora_llegada = segundos_a_hora(hora_actual_segundos)
 
                 # Crear el diccionario de respuesta en JSON
-                response = {'ruta': ruta, 'tiempos': tiempos, 'trayectos': trayectos, 'duracionTotal': duracion_total}
+                response = {'ruta': ruta, 'tiempos': tiempos, 'trayectos': trayectos, 'duracionTotal': duracion_total, "horaLlegada": hora_llegada}
 
                 # Enviar la respuesta con el resultado en formato JSON
                 self.send_response(200)
