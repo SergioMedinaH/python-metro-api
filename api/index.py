@@ -271,13 +271,14 @@ class handler(BaseHTTPRequestHandler):
                     G1.add_edge("9dejulio", "carlospellegrini", weight=99999)
                     G1.add_edge("retiroc", "retiroe", weight=99999)
                 else:
-                    G1.add_edge("independencia", "independenciae", weight=1)
-                    G1.add_edge("peru", "bolivar", weight=2)
-                    G1.add_edge("peru", "catedral", weight=2)
-                    G1.add_edge("lima", "avdemayo", weight=2)
-                    G1.add_edge("diagonal", "9dejulio", weight=2)
-                    G1.add_edge("9dejulio", "carlospellegrini", weight=2)
-                    G1.add_edge("retiroc", "retiroe", weight=2)
+                    G1.add_edge("independencia", "independenciae", weight=calcular_distancia("independencia", "independenciae"))
+                    G1.add_edge("peru", "bolivar", weight=calcular_distancia("peru", "bolivar"))
+                    G1.add_edge("peru", "catedral", weight=calcular_distancia("peru", "catedral"))
+                    G1.add_edge("lima", "avdemayo", weight=calcular_distancia("lima", "avdemayo"))
+                    G1.add_edge("diagonal", "9dejulio", weight=calcular_distancia("diagonal", "9dejulio"))
+                    G1.add_edge("9dejulio", "carlospellegrini", weight=calcular_distancia("9dejulio", "carlospellegrini"))
+                    G1.add_edge("retiroc", "retiroe", weight=calcular_distancia("retiroc", "retiroe"))
+
 
                 # Realizar la suma
                 ruta = nx.astar_path(G1, origen, destino, heuristic=heuristica, weight="weight")
