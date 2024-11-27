@@ -71,11 +71,11 @@ G1.add_edge("florida", "leandro", weight=calcular_distancia("florida", "leandro"
 G1.add_edge("constitucion", "sanjuan", weight=calcular_distancia("constitucion", "sanjuan"))
 G1.add_edge("sanjuan", "independencia", weight=calcular_distancia("sanjuan", "independencia"))
 G1.add_edge("independencia", "moreno", weight=calcular_distancia("independencia", "moreno"))
-G1.add_edge("moreno", "avdemayoc", weight=calcular_distancia("moreno", "avdemayoc"))
-G1.add_edge("avdemayoc", "diagonal", weight=calcular_distancia("avdemayoc", "diagonal"))
+G1.add_edge("moreno", "avdemayo", weight=calcular_distancia("moreno", "avdemayo"))
+G1.add_edge("avdemayo", "diagonal", weight=calcular_distancia("avdemayo", "diagonal"))
 G1.add_edge("diagonal", "lavalle", weight=calcular_distancia("diagonal", "lavalle"))
 G1.add_edge("lavalle", "sanmartin", weight=calcular_distancia("lavalle", "sanmartin"))
-G1.add_edge("sanmartin", "reitroc", weight=calcular_distancia("sanmartin", "reitroc"))
+G1.add_edge("sanmartin", "retiroc", weight=calcular_distancia("sanmartin", "retiroc"))
 
 # linea D 
 G1.add_edge("facultadmedicina", "callao", weight=calcular_distancia("facultadmedicina", "callao"))
@@ -84,8 +84,8 @@ G1.add_edge("tribunales", "9dejulio", weight=calcular_distancia("tribunales", "9
 G1.add_edge("9dejulio", "catedral", weight=calcular_distancia("9dejulio", "catedral"))
 
 # linea E
-G1.add_edge("pichincha", "entrerio-rodolfowalsh", weight=calcular_distancia("pichincha", "entrerio-rodolfowalsh"))
-G1.add_edge("entrerio-rodolfowalsh", "sanjose", weight=calcular_distancia("entrerio-rodolfowalsh", "sanjose"))
+G1.add_edge("pichincha", "entrerios-rodolfowalsh", weight=calcular_distancia("pichincha", "entrerios-rodolfowalsh"))
+G1.add_edge("entrerios-rodolfowalsh", "sanjose", weight=calcular_distancia("entrerios-rodolfowalsh", "sanjose"))
 G1.add_edge("sanjose", "independenciae", weight=calcular_distancia("sanjose", "independenciae"))
 G1.add_edge("independenciae", "belgrano", weight=calcular_distancia("independenciae", "belgrano"))
 G1.add_edge("belgrano", "bolivar", weight=calcular_distancia("belgrano", "bolivar"))
