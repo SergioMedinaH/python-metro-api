@@ -138,7 +138,7 @@ def tiempo_espera(paradaActual: str, direccion: str, hora_actual_segundos: int, 
     tiempo_espera = abs(hora_actual_segundos - hora_inicio_parada)
     return tiempo_espera, segundos_a_hora(hora_inicio_parada)
 
-def obtenerTiempoTransbordo(parada1, parada2):
+def obtener_tiempo_transbordo(parada1, parada2):
     nombre = f"{parada1["value"]}-{parada2["value"]}"
     transbordos = { 
     "independencia-independenciae" : 112,
@@ -216,7 +216,7 @@ def get_trayectos(ruta, numero_dia: int):
                 trayectos.append({
                     "linea": "Transbordo",
                     "paradas": [parada_anterior, parada],
-                    "tiempos": [obtenerTiempoTransbordo(parada_anterior, parada)]
+                    "tiempos": [obtener_tiempo_transbordo(parada_anterior, parada)]
                 })
                 trayecto_actual = {
                     "linea": parada["linea"],
