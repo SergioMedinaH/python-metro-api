@@ -103,7 +103,15 @@ G1.add_edge("bolivar", "correocentral", weight=calcular_distancia("bolivar", "co
 G1.add_edge("correocentral", "catalinas", weight=calcular_distancia("correocentral", "catalinas"))
 G1.add_edge("catalinas", "retiroe", weight=calcular_distancia("catalinas", "retiroe"))
 
-
+def dia_semana(numero_dia):
+    dia = ""
+    if 1 <= numero_dia <= 5:
+        dia = "semana"
+    elif numero_dia == 6:
+        dia = "sabado"
+    else:
+        dia = "domingo"
+    return dia
 
 
 
@@ -117,13 +125,16 @@ def segundos_a_hora(segundos):
     minutos = int((segundos % 3600) // 60 )
     return f"{horas:02}:{minutos:02}"
 
-def tiempo_espera(paradaActual: str, direccion: str, hora_actual_segundos: int):
+def tiempo_espera(paradaActual: str, direccion: str, hora_actual_segundos: int, numero_dia):
     parada = encontrar_parada(paradaActual)
     hora_inicio_parada = hora_a_segundos(parada[direccion])
     tiempo_espera = 0
     while hora_inicio_parada < hora_actual_segundos:
         #CAMBIAR A SEGUNDOS EN CSV ------------------------------------------------------------------------------------------
-        hora_inicio_parada += parada["frecuencia"]*60
+        if dia_semana(numero_dia) == "semana":
+            hora_inicio_parada += parada["frecuencia"]*60
+        else:
+            hora_inicio_parada += parada["frecuencia_finde"]*60
     tiempo_espera = abs(hora_actual_segundos - hora_inicio_parada)
     return tiempo_espera, segundos_a_hora(hora_inicio_parada)
 
@@ -154,7 +165,7 @@ def obtenerTiempoTransbordo(parada1, parada2):
     return transbordos[nombre]
 
 
-def get_trayectos(ruta):
+def get_trayectos(ruta, numero_dia: int):
     
     # Convertir los valores de las paradas a objetos parada completos
     paradas_ruta = [encontrar_parada(valor) for valor in ruta]
@@ -183,10 +194,22 @@ def get_trayectos(ruta):
                 if parada_anterior["IDs"] < parada["IDs"]:
                     #hacia derecha
                     trayecto_actual["tiempos"].append(parada_anterior["tiempoASiguiente"])
-                    trayecto_actual["direccion"] = "hacia_derecha"
+
+                    if dia_semana(numero_dia) == "semana":
+                        trayecto_actual["direccion"] = "hacia_derecha"
+                    elif dia_semana(numero_dia) == "sabado":
+                        trayecto_actual["direccion"] = "hacia_derecha_S"
+                    else:
+                        trayecto_actual["direccion"] = "hacia_derecha_D"
+
                 else:
                     trayecto_actual["tiempos"].append(parada_anterior["tiempoAAnterior"])
-                    trayecto_actual["direccion"] = "hacia_izquierda"
+                    if dia_semana(numero_dia) == "semana":
+                        trayecto_actual["direccion"] = "hacia_izquierda"
+                    elif dia_semana(numero_dia) == "sabado":
+                        trayecto_actual["direccion"] = "hacia_izquierda_S"
+                    else:
+                        trayecto_actual["direccion"] = "hacia_izquierda_D"
                 
             else:
                 trayectos.append(trayecto_actual)
@@ -209,36 +232,6 @@ def get_trayectos(ruta):
         trayectos.append(trayecto_actual)
     
     return trayectos
-
-def calcular_distancia(parada1: str, parada2: str) -> float:
-    """Calcula la distancia en línea recta entre dos paradas utilizando sus latitudes y longitudes."""
-    p1 = encontrar_parada(parada1)
-    p2 = encontrar_parada(parada2)
-    
-    # Si no se encuentran ambas paradas, retornar un valor alto (para evitar un camino no válido)
-    if not p1 or not p2:
-        return float('inf')
-    
-    # Radio de la Tierra en kilómetros
-    R = 6371.0
-
-    # Convertir las coordenadas de grados a radianes
-    lat1, lon1 = math.radians(p1["lat"]), math.radians(p1["lng"])
-    lat2, lon2 = math.radians(p2["lat"]), math.radians(p2["lng"])
-
-    # Diferencias
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    # Fórmula de Haversine
-    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    # Distancia en kilómetros
-    distancia = R * c
-    velocidad_promedio = 0.5
-    tiempo = distancia / velocidad_promedio
-    return tiempo
 
 
 def heuristica(paradaActual: str, paradaDestino: str) -> float:
@@ -284,7 +277,7 @@ class handler(BaseHTTPRequestHandler):
                 ruta = nx.astar_path(G1, origen, destino, heuristic=heuristica, weight="weight")
                 tiempos = [G1[ruta[i]][ruta[i+1]]["weight"] for i in range(len(ruta) - 1)]
                 
-                trayectos = get_trayectos(ruta)
+                trayectos = get_trayectos(ruta, fecha)
 
                 hora_actual_segundos_inicio = hora_a_segundos(hora_actual)
                 hora_actual_segundos = hora_actual_segundos_inicio
