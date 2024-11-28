@@ -105,9 +105,9 @@ G1.add_edge("catalinas", "retiroe", weight=calcular_distancia("catalinas", "reti
 
 def dia_semana(numero_dia):
     dia = ""
-    if 1 <= numero_dia <= 5:
+    if 1 <= int(numero_dia) <= 5:
         dia = "semana"
-    elif numero_dia == 6:
+    elif int(numero_dia) == 6:
         dia = "sabado"
     else:
         dia = "domingo"
@@ -285,7 +285,7 @@ class handler(BaseHTTPRequestHandler):
                 for linea in trayectos:
                     if linea["linea"] != "Transbordo":
                         if len(linea["paradas"]) >1:
-                            linea["tiempoEspera"], linea["horaSalida"] = tiempo_espera(linea["paradas"][0]["value"], linea["direccion"], hora_actual_segundos)
+                            linea["tiempoEspera"], linea["horaSalida"] = tiempo_espera(linea["paradas"][0]["value"], linea["direccion"], hora_actual_segundos, fecha)
 
 
                             
