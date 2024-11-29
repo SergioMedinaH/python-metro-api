@@ -103,6 +103,15 @@ G1.add_edge("bolivar", "correocentral", weight=calcular_distancia("bolivar", "co
 G1.add_edge("correocentral", "catalinas", weight=calcular_distancia("correocentral", "catalinas"))
 G1.add_edge("catalinas", "retiroe", weight=calcular_distancia("catalinas", "retiroe"))
 
+#transbordos
+G1.add_edge("independencia", "independenciae", weight=calcular_distancia("independencia", "independenciae"))
+G1.add_edge("peru", "bolivar", weight=calcular_distancia("peru", "bolivar"))
+G1.add_edge("peru", "catedral", weight=calcular_distancia("peru", "catedral"))
+G1.add_edge("lima", "avdemayo", weight=calcular_distancia("lima", "avdemayo"))
+G1.add_edge("diagonal", "9dejulio", weight=calcular_distancia("diagonal", "9dejulio"))
+G1.add_edge("9dejulio", "carlospellegrini", weight=calcular_distancia("9dejulio", "carlospellegrini"))
+G1.add_edge("retiroc", "retiroe", weight=calcular_distancia("retiroc", "retiroe"))
+
 def dia_semana(numero_dia):
     dia = ""
     if 1 <= int(numero_dia) <= 5:
@@ -130,7 +139,6 @@ def tiempo_espera(paradaActual: str, direccion: str, hora_actual_segundos: int, 
     hora_inicio_parada = hora_a_segundos(parada[direccion])
     tiempo_espera = 0
     while hora_inicio_parada < hora_actual_segundos:
-        #CAMBIAR A SEGUNDOS EN CSV ------------------------------------------------------------------------------------------
         if dia_semana(numero_dia) == "semana":
             hora_inicio_parada += parada["frecuencia"]*60
         else:
@@ -246,32 +254,13 @@ class handler(BaseHTTPRequestHandler):
         params = parse_qs(query)
         
         # Verificar que se reciban los parámetros "paradaOrigen" y "paradaDestino"
-        if 'paradaOrigen' in params and 'paradaDestino' in params and 'hora' in params and 'fecha' in params and 'prioridadTransbordos' in params:
+        if 'paradaOrigen' in params and 'paradaDestino' in params and 'hora' in params and 'fecha' in params:
             try:
                 # Convertir los valores a enteros
                 origen = params['paradaOrigen'][0]
                 destino = params['paradaDestino'][0]
                 hora_actual = params['hora'][0] # formato HH:MM
                 fecha = params['fecha'][0] # dia de la semana  0 - Domingo, 1 - Lunes, 2 - Martes, 3 - Miercoles, 4 - Jueves, 5 - Viernes, 6 - Sabado
-                prioridadTransbordos = params['prioridadTransbordos'][0].lower() == 'true'  # booleano
-
-                if prioridadTransbordos:
-                    G1.add_edge("independencia", "independenciae", weight=99999)
-                    G1.add_edge("peru", "bolivar", weight=99999)
-                    G1.add_edge("peru", "catedral", weight=99999)
-                    G1.add_edge("lima", "avdemayo", weight=99999)
-                    G1.add_edge("diagonal", "9dejulio", weight=99999)
-                    G1.add_edge("9dejulio", "carlospellegrini", weight=99999)
-                    G1.add_edge("retiroc", "retiroe", weight=99999)
-                else:
-                    G1.add_edge("independencia", "independenciae", weight=calcular_distancia("independencia", "independenciae"))
-                    G1.add_edge("peru", "bolivar", weight=calcular_distancia("peru", "bolivar"))
-                    G1.add_edge("peru", "catedral", weight=calcular_distancia("peru", "catedral"))
-                    G1.add_edge("lima", "avdemayo", weight=calcular_distancia("lima", "avdemayo"))
-                    G1.add_edge("diagonal", "9dejulio", weight=calcular_distancia("diagonal", "9dejulio"))
-                    G1.add_edge("9dejulio", "carlospellegrini", weight=calcular_distancia("9dejulio", "carlospellegrini"))
-                    G1.add_edge("retiroc", "retiroe", weight=calcular_distancia("retiroc", "retiroe"))
-
 
                 # Realizar la suma
                 ruta = nx.astar_path(G1, origen, destino, heuristic=heuristica, weight="weight")
@@ -323,4 +312,4 @@ class handler(BaseHTTPRequestHandler):
             self.send_response(400)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps({'error': 'Falta algún parámetro como paradaOrigen, paradaDestino, hora, fecha o prioridadTransbordos'}).encode('utf-8'))
+            self.wfile.write(json.dumps({'error': 'Falta algún parámetro como paradaOrigen, paradaDestino, hora o fecha'}).encode('utf-8'))
