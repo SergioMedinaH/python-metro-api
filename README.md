@@ -1,24 +1,37 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fhello-world&demo-title=Python%20Hello%20World&demo-description=Use%20Python%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fpython-hello-world.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994600/random/python.png)
+# Metro route planner: A* API
 
-# Python Hello World
+University project (UPM, 2024). Python API that finds the fastest route between two stations of the Buenos Aires Subte (central network: lines A to E, 37 stations) and turns it into a timed itinerary.
 
-This example shows how to use Python on Vercel with Serverless Functions using the [Python Runtime](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python).
+**Live app:** [appmetro.vercel.app](https://appmetro.vercel.app) · **Frontend:** [python-metro-frontend](https://github.com/SergioMedinaH/python-metro-frontend)
 
-## Demo
+## How it works
 
-https://python-hello-world.vercel.app/
+1. **Graph.** Stations are nodes in a NetworkX graph; each edge is a track segment or a transfer between lines, weighted by the real distance between stations (Haversine on their coordinates).
+2. **Search.** The route is found with **A\***, using the straight-line distance to the destination as the heuristic. It never overestimates the remaining distance, so A* returns the shortest path while exploring fewer nodes than Dijkstra.
+3. **Itinerary.** The path is split into legs per line. For each leg the API computes the direction, the next departure from the timetable (first train plus weekday or weekend frequency), the waiting time and the arrival time. Transfers add their measured walking time.
+4. **Station data** comes from a CSV: coordinates, line, first trains in each direction for weekdays, Saturdays and Sundays, frequencies, travel time to the next station, and accessibility (stairs, escalators, lifts).
 
-## Running Locally
+## API
 
-```bash
-npm i -g vercel
-vercel dev
+```
+GET /api?paradaOrigen=alberti&paradaDestino=retiroe&hora=10:00&fecha=1
 ```
 
-Your Python API is now available at `http://localhost:3000/api`.
+| Parameter | Meaning |
+|---|---|
+| `paradaOrigen`, `paradaDestino` | Station ids (see `data/paradas.csv`) |
+| `hora` | Departure time, `HH:MM` |
+| `fecha` | Day of the week, 0 = Sunday … 6 = Saturday |
 
-## One-Click Deploy
+The response includes the station sequence, the legs with departure and arrival times, the total duration and the arrival time.
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
+## Stack
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fhello-world&demo-title=Python%20Hello%20World&demo-description=Use%20Python%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fpython-hello-world.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994600/random/python.png)
+Python · NetworkX · pandas · Vercel serverless functions
+
+## Run locally
+
+```bash
+pip install -r requirements.txt
+vercel dev
+```
